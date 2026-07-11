@@ -1,0 +1,49 @@
+# Pilot-technique event set. Thresholds are tunable without touching code;
+# numeric literals may reference aircraft.yaml as $aircraft.<path>.
+rules:
+  - id: unstable_500agl
+    description: >
+      Unstable approach at the 500 ft AGL gate: speed outside Vref -5/+8,
+      sink rate beyond 1000 fpm, or more than ~half-scale glidepath deviation
+      at the moment of crossing 500 AGL descending.
+    severity: warning
+    phases: [approach]
+    gate: { parameter: agl_ft, crossing: { value: 500, direction: down } }
+    when:
+      any:
+        - { parameter: ias_kt, outside: { min: 55, max: 68 } } # vref 60 -5/+8
+        - { parameter: vsi_fpm, lt: -1000 }
+        - { parameter: gp_dev_deg, abs_gt: 0.7 }
+
+  - id: sink_rate_low
+    description: Sink rate over 1000 fpm below 1000 ft AGL
+    severity: warning
+    phases: [approach, descent]
+    when:
+      all:
+        - { parameter: agl_ft, lt: 1000, gt: 50 }
+        - { parameter: vsi_fpm, lt: -1000 }
+    min_duration_s: 3
+    hysteresis: { release_after_s: 2 }
+    peak: { parameter: vsi_fpm, mode: min }
+
+  - id: landing_g
+    description: Hard touchdown (normal acceleration over 2.0 G)
+    severity: caution
+    window: { anchor: touchdown, before_s: 2, after_s: 3 }
+    when: { parameter: norm_g, gt: 2.0 }
+    peak: { parameter: norm_g, mode: max }
+
+  - id: bank_angle_45
+    description: Bank angle beyond 45 degrees
+    severity: warning
+    when: { parameter: roll_deg, abs_gt: 45 }
+    min_duration_s: 2
+    peak: { parameter: roll_deg, mode: abs_max }
+
+  - id: vne_exceed
+    description: Airspeed above Vne
+    severity: exceedance
+    when: { parameter: ias_kt, gt: '$aircraft.vspeeds.vne_kt' }
+    min_duration_s: 1
+    peak: { parameter: ias_kt, mode: max }

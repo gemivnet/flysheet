@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+/data/
+fixtures/generated/
+packages/web/public/cesium/
+.env

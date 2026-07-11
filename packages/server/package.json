@@ -1,0 +1,44 @@
+{
+  "name": "@foqa/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "foqa": "./bin/foqa.js"
+  },
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "tsx src/main.ts",
+    "migrate": "node-pg-migrate --migrations-dir migrations --migration-file-language sql",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@foqa/shared": "*",
+    "chokidar": "^4.0.0",
+    "csv-parse": "^5.6.0",
+    "express": "^5.1.0",
+    "node-pg-migrate": "^7.9.0",
+    "pg": "^8.13.0",
+    "pg-boss": "^10.1.0",
+    "pg-copy-streams": "^6.0.6",
+    "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
+    "playwright-core": "^1.50.0",
+    "tsx": "^4.19.0",
+    "yaml": "^2.7.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@foqa/g3x-synth": "*",
+    "@types/express": "^5.0.0",
+    "@types/pg": "^8.11.0",
+    "@types/pg-copy-streams": "^1.2.5",
+    "@types/supertest": "^6.0.2",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "supertest": "^7.0.0"
+  }
+}

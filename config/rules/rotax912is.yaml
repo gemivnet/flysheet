@@ -1,0 +1,43 @@
+# Rotax 912iS operating-limit event set (Operators Manual limits). Doubles as
+# break-in monitoring and trend-based maintenance input.
+rules:
+  - id: coolant_temp_max
+    description: Coolant temperature above the 120 °C limit
+    severity: exceedance
+    when: { parameter: coolant_temp_c, gt: 120 }
+    min_duration_s: 5
+    hysteresis: { release_after_s: 5 }
+    peak: { parameter: coolant_temp_c, mode: max }
+
+  - id: oil_temp_max
+    description: Oil temperature above the 130 °C limit
+    severity: exceedance
+    when: { parameter: oil_temp_c, gt: 130 }
+    min_duration_s: 5
+    hysteresis: { release_after_s: 5 }
+    peak: { parameter: oil_temp_c, mode: max }
+
+  - id: oil_press_band
+    description: >
+      Oil pressure outside the 22-73 psi normal band. Phase-scoped to flight
+      phases so start/shutdown transients don't fire it.
+    severity: warning
+    phases: [takeoff, climb, cruise, descent, approach, go_around, landing]
+    when: { parameter: oil_press_psi, outside: { min: 22, max: 73 } }
+    min_duration_s: 5
+    peak: { parameter: oil_press_psi, mode: min }
+
+  - id: rpm_time_limit
+    description: Above 5500 RPM (max takeoff power) beyond the 5-minute limit
+    severity: warning
+    when: { parameter: rpm, gt: 5500 }
+    min_duration_s: 300
+    peak: { parameter: rpm, mode: max }
+
+  - id: egt_spread_high
+    description: EGT spread above 80 °C (injector/ignition imbalance indicator)
+    severity: caution
+    phases: [climb, cruise, descent]
+    when: { parameter: egt_spread_c, gt: 80 }
+    min_duration_s: 10
+    peak: { parameter: egt_spread_c, mode: max }

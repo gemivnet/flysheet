@@ -1,0 +1,66 @@
+# Maps G3X CSV header cells to canonical parameters (@foqa/shared params.ts).
+# Multiple header spellings per parameter cover G3X software-version drift.
+# Unmapped columns are preserved in samples.extra — add a mapping here and
+# reparse to promote one.
+version: 1
+
+time:
+  date: ["Lcl Date"]
+  time: ["Lcl Time"]
+  utcOffset: ["UTCOfst", "UTC Ofst"]
+
+parameters:
+  lat:
+    headers: ["Latitude", "Lat"]
+  lon:
+    headers: ["Longitude", "Long", "Lon"]
+  alt_msl_ft:
+    headers: ["AltMSL", "Alt MSL"]
+  alt_gps_ft:
+    headers: ["AltGPS", "GPS Alt"]
+  oat_c:
+    headers: ["OAT"]
+  ias_kt:
+    headers: ["IAS"]
+  tas_kt:
+    headers: ["TAS"]
+  gs_kt:
+    headers: ["GndSpd", "Gnd Spd", "GS"]
+  vsi_fpm:
+    headers: ["VSpd", "V Spd", "VSI"]
+  pitch_deg:
+    headers: ["Pitch"]
+  roll_deg:
+    headers: ["Roll"]
+  lat_g:
+    headers: ["LatAc", "Lat Ac"]
+  norm_g:
+    headers: ["NormAc", "Norm Ac"]
+  hdg_deg:
+    headers: ["HDG", "Heading"]
+  track_deg:
+    headers: ["TRK", "Track"]
+  volts:
+    headers: ["volt1", "Volt1", "Bus Volts"]
+  amps:
+    headers: ["amp1", "Amp1"]
+  fuel_qty_gal:
+    headers: ["FQtyL", "FQty"]
+  fuel_flow_gph:
+    headers: ["E1 FFlow", "FFlow"]
+  oil_temp_c:
+    headers: ["E1 OilT", "OilT"]
+  oil_press_psi:
+    headers: ["E1 OilP", "OilP"]
+  rpm:
+    headers: ["E1 RPM", "RPM"]
+  coolant_temp_c:
+    headers: ["E1 CoolT", "CoolT", "E1 CHT1"]
+  egt1_c:
+    headers: ["E1 EGT1"]
+  egt2_c:
+    headers: ["E1 EGT2"]
+  egt3_c:
+    headers: ["E1 EGT3"]
+  egt4_c:
+    headers: ["E1 EGT4"]

@@ -1,0 +1,19 @@
+{
+  "name": "@foqa/g3x-synth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "g3x-synth": "./bin/g3x-synth.js"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@foqa/shared": "*"
+  }
+}

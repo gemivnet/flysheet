@@ -1,0 +1,42 @@
+# RV-12 / Rotax 912iS airframe constants.
+# Rules may reference any numeric leaf here as $aircraft.<path>, so V-speed
+# tuning never requires touching rule logic or code.
+name: RV-12
+engine: Rotax 912iS
+
+vspeeds:
+  vs0_kt: 41
+  vr_kt: 50
+  vx_kt: 60
+  vy_kt: 75
+  vfe_kt: 82
+  va_kt: 90
+  vno_kt: 108
+  vne_kt: 136
+  vref_kt: 60 # normal final-approach target
+
+pattern_alt_agl_ft: 1000
+
+# Phase-detection thresholds (see packages/server/src/analyze/phases.ts)
+phases:
+  ground_agl_ft: 25
+  ground_vsi_fpm: 300
+  ground_debounce_s: 3
+  moving_gs_kt: 5
+  moving_sustain_s: 10
+  takeoff_rpm: 4800
+  climb_vsi_fpm: 300
+  descent_vsi_fpm: -300
+  vsi_debounce_s: 5
+  approach_agl_ft: 1500
+  approach_airport_dist_nm: 5
+  goaround_vsi_fpm: 300
+  goaround_rpm_jump: 500
+  goaround_rpm_window_s: 5
+  goaround_max_agl_ft: 1000
+  touchngo_max_ground_s: 30
+  landing_agl_ft: 100
+
+stitching:
+  max_gap_s: 300
+  max_dist_nm: 2
