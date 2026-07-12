@@ -7,3 +7,4 @@ coverage/
 fixtures/generated/
 packages/web/public/cesium/
 .env
+.claude/settings.local.json
