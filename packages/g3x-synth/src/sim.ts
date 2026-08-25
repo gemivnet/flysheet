@@ -1,4 +1,4 @@
-import { bearingDeg, destinationPoint, haversineNm, headingDiffDeg, noise } from '@foqa/shared';
+import { bearingDeg, destinationPoint, haversineNm, noise } from '@foqa/shared';
 import {
   initialEngineState,
   stepEngine,

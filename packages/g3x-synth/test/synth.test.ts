@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { haversineNm } from '@foqa/shared';
 import { AIRPORTS, runwayEnd } from '../src/airports.js';
 import { G3X_COLUMNS, writeG3xCsv } from '../src/writer.js';
-import {
-  SCENARIO_NAMES,
-  generateScenario,
-  simulateScenario,
-  type ScenarioName,
-} from '../src/scenarios.js';
+import { SCENARIO_NAMES, generateScenario, simulateScenario } from '../src/scenarios.js';
 import type { SimSample } from '../src/sim.js';
 
 function liftoffs(samples: SimSample[]): number[] {

@@ -71,7 +71,7 @@ Work in progress. What's real and tested today:
 - ✅ Ingest watcher (sha256 dedupe, archive, cross-device moves)
 - ✅ Flight assembly / log stitching
 - ✅ Phase detection
-- ✅ YAML rules engine
+- 🚧 YAML rules engine (schema + loader done; no evaluator, no events writer, no enrichment for the derived channels the rules reference)
 - ✅ Synthetic data generator
 - ✅ TimescaleDB schema + migrations
 
