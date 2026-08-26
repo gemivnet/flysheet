@@ -9,7 +9,9 @@ services:
       POSTGRES_PASSWORD: foqa
       POSTGRES_DB: foqa
     ports:
-      - '5432:5432'
+      # Loopback only: the credentials above are foqa/foqa. This stack is documented as
+      # dev-on-the-host, so nothing off-box needs to reach the database.
+      - '127.0.0.1:5432:5432'
     volumes:
       - pgdata-dev:/var/lib/postgresql/data
     healthcheck:
@@ -21,7 +23,9 @@ services:
   grafana:
     image: grafana/grafana:11.5.1
     ports:
-      - '3000:3000'
+      # Loopback only: anonymous auth is on with the Admin role below, so on 0.0.0.0
+      # anyone reaching this port is a Grafana admin with no login.
+      - '127.0.0.1:3000:3000'
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
