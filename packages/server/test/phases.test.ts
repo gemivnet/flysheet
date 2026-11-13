@@ -3,6 +3,7 @@ import { simulateScenario, type ScenarioName } from '@foqa/g3x-synth';
 import { loadConfig } from '../src/config.js';
 import { detectPhases, type PhaseResult } from '../src/analyze/phases.js';
 import { simChannels } from './helpers/simChannels.js';
+import type { FlightChannels } from '../src/analyze/channels.js';
 
 const { aircraft } = loadConfig();
 
@@ -103,7 +104,14 @@ describe('detectPhases', () => {
       ts: keep.map((i) => ch.ts[i]!),
       v: Object.fromEntries(Object.entries(ch.v).map(([k, arr]) => [k, keep.map((i) => arr[i]!)])),
     };
-    const r = { ...detectPhases(gapped, aircraft, keep.map((i) => airportDistNm[i]!)), n: keep.length };
+    const r = {
+      ...detectPhases(
+        gapped,
+        aircraft,
+        keep.map((i) => airportDistNm[i]!),
+      ),
+      n: keep.length,
+    };
     assertInvariants(r);
     expect(count(r, 'takeoff')).toBe(1);
     expect(count(r, 'landing')).toBe(1);
@@ -118,5 +126,53 @@ describe('detectPhases', () => {
       expect(count(r, 'landing'), name).toBe(1);
       expect(count(r, 'go_around'), name).toBe(0);
     }
+  });
+
+  it('balked landing: a go-around that starts below the landing gate does not swallow the flight', () => {
+    // 1 Hz hand-built flight: ground, taxi, takeoff roll, climb, cruise, descent to
+    // 60 ft AGL (below landing_agl_ft, above ground_agl_ft), full power and climb
+    // out, level off. The aircraft never touches down again.
+    const seg: {
+      n: number;
+      agl: (k: number) => number;
+      vsi: number;
+      gs: number;
+      rpm: (k: number) => number;
+    }[] = [
+      { n: 10, agl: () => 0, vsi: 0, gs: 0, rpm: () => 1000 },
+      { n: 15, agl: () => 0, vsi: 0, gs: 10, rpm: () => 1500 },
+      { n: 15, agl: () => 0, vsi: 0, gs: 40, rpm: () => 5500 },
+      { n: 130, agl: (k) => 15 * k, vsi: 900, gs: 80, rpm: () => 5500 },
+      { n: 30, agl: () => 1950, vsi: 0, gs: 100, rpm: () => 5000 },
+      { n: 230, agl: (k) => 1950 - 8.3 * k, vsi: -500, gs: 80, rpm: () => 3500 },
+      { n: 6, agl: () => 60, vsi: -100, gs: 70, rpm: () => 3500 },
+      { n: 60, agl: (k) => 60 + 12 * k, vsi: 700, gs: 75, rpm: () => 5600 },
+      { n: 30, agl: () => 780, vsi: 0, gs: 90, rpm: () => 5000 },
+    ];
+    const ts: Date[] = [];
+    const v: Record<string, (number | null)[]> = { agl_ft: [], vsi_fpm: [], gs_kt: [], rpm: [] };
+    const t0 = Date.UTC(2026, 0, 1);
+    for (const s of seg) {
+      for (let k = 0; k < s.n; k++) {
+        ts.push(new Date(t0 + ts.length * 1000));
+        v.agl_ft!.push(s.agl(k));
+        v.vsi_fpm!.push(s.vsi);
+        v.gs_kt!.push(s.gs);
+        v.rpm!.push(s.rpm(k));
+      }
+    }
+    const ch: FlightChannels = { ts, v };
+    const r = { ...detectPhases(ch, aircraft), n: ts.length };
+    assertInvariants(r);
+    const names = r.phases.map((p) => p.phase);
+    expect(names).toContain('approach');
+    expect(names).not.toContain('rollout');
+    expect(count(r, 'landing')).toBe(0);
+    expect(count(r, 'go_around')).toBe(1);
+    expect(r.touchdowns).toHaveLength(0);
+    // the go-around hands on to climb and the flight ends in a non-landing phase
+    const gaIdx = names.indexOf('go_around');
+    expect(names[gaIdx - 1]).toBe('approach');
+    expect(names[gaIdx + 1]).toBe('climb');
   });
 });
