@@ -88,7 +88,7 @@ function finalAndLand(rwy: RunwayEnd, opts: FinalOptions = {}): Segment[] {
   const faf = finalFix(rwy, 3.2);
   const glide = { thrLat: rwy.thrLat, thrLon: rwy.thrLon, thrElevFt: rwy.elevFt, angleDeg: 3.0 };
   const segs: Segment[] = [
-    { name: 'intercept', navTo: faf, altMsl: rwy.elevFt + 1150, vsi: 500, ias: 75, rpm: 4400, until: { closerThan: { ...faf, nm: 0.35 } }, maxDurationS: 600 },
+    { name: 'intercept', navTo: faf, altMsl: rwy.elevFt + 1150, vsi: 500, ias: 75, rpm: 4400, groundElevFt: rwy.elevFt, until: { closerThan: { ...faf, nm: 0.35 } }, maxDurationS: 600 },
   ];
   if (opts.unstable) {
     segs.push(

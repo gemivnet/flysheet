@@ -1,9 +1,9 @@
 # This project is parked, not finished. CI exists so it stops rotting further -- it
 # catches unused imports, syntax breakage and a build that no longer completes.
 #
-# Two gates are deliberately NOT run here, because both fail for real reasons and a
-# permanently red CI teaches everyone to ignore it. Neither is hidden; both are recorded
-# so whoever picks this up finds them:
+# One gate is deliberately NOT run here, because it fails for a real reason and a
+# permanently red CI teaches everyone to ignore it. It is recorded so whoever picks this
+# up finds it:
 #
 #   npm run typecheck  -- ~10 errors, all in packages/server/src/analyze/phases.ts.
 #     TypeScript narrows `current` to its initializer "preflight" and then reports every
@@ -11,14 +11,13 @@
 #     through a closure and control-flow analysis does not track that. Plus one
 #     strict-null error at phases.ts:72. Fixing it means restructuring that loop.
 #
-#   npm test           -- 66 of 67 pass. The failure is
-#     "detectPhases > normal-xc: clean single-leg sequence", which expects the last phase
-#     to be `postflight` and gets `landing`. That is a genuine defect, not a stale test:
-#     the chain is landing -> (grounded) rollout -> (!moving) taxi -> (rpm<200) postflight,
-#     and a normal flight never leaves `landing`. The same missing exit is why a balked
-#     landing swallows the rest of a flight.
+# Re-enable it once that defect is fixed.
 #
-# Re-enable each step as its underlying defect is fixed.
+# `npm test` runs here (all 67 pass). It had been left out while
+# "detectPhases > normal-xc" failed; that was a simulator bug, not a detector bug: the
+# synthetic flight's ground elevation stayed at the departure field (KLOT, 679 ft) so a
+# flight landing at KIKK (630 ft) was clamped 49 ft AGL and never touched down.
+# The server tests boot an embedded Postgres, which needs a non-root user (the runner is).
 name: CI
 
 on:
@@ -45,3 +44,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm test
