@@ -69,7 +69,7 @@ export function detectPhases(
   for (let i = 0; i < n; i++) {
     const a = agl[i];
     const v = vsi[i] ?? 0;
-    groundRaw[i] = (a === null ? true : a < p.ground_agl_ft) && Math.abs(v) < p.ground_vsi_fpm;
+    groundRaw[i] = (a == null ? true : a < p.ground_agl_ft) && Math.abs(v) < p.ground_vsi_fpm;
     climbRaw[i] = v > p.climb_vsi_fpm;
     descendRaw[i] = v < p.descent_vsi_fpm;
   }
@@ -102,7 +102,7 @@ export function detectPhases(
 
   // ---- pass 2: transition table ----
   const phases: PhaseSpan[] = [];
-  let current: PhaseName = 'preflight';
+  let current = 'preflight' as PhaseName; // cast: assigned in the loop as well as by emit()
   let startIdx = 0;
   let touchdownThisApproach = false;
   let circuit = 0;
@@ -181,6 +181,16 @@ export function detectPhases(
         if (grounded) {
           touchdownThisApproach = true;
           emit(i, 'rollout');
+        } else if (
+          (climbing[i] || ((vsi[i] ?? 0) > p.goaround_vsi_fpm && rpmJump[i])) &&
+          phases.at(-1)?.phase === 'approach'
+        ) {
+          // balked landing: power came on below the landing gate and the aircraft never
+          // touched down. Fold the short final back into its approach (no landing for
+          // this approach) and continue as a go-around.
+          phases.at(-1)!.endIdx = i - 1;
+          startIdx = i;
+          current = 'go_around';
         }
         break;
       case 'rollout':
