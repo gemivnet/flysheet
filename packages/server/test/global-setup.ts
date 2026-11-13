@@ -1,8 +1,21 @@
 import { mkdtempSync, rmSync } from 'node:fs';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
 import type { TestProject } from 'vitest/node';
+
+/** Asks the OS for a free TCP port so concurrent test runs never collide. */
+function freePort(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const srv = createServer();
+    srv.once('error', reject);
+    srv.listen(0, '127.0.0.1', () => {
+      const { port } = srv.address() as { port: number };
+      srv.close((err) => (err ? reject(err) : resolve(port)));
+    });
+  });
+}
 
 /**
  * Boots one embedded Postgres for the whole server test run. Individual test
@@ -11,7 +24,7 @@ import type { TestProject } from 'vitest/node';
  */
 export default async function setup(project: TestProject): Promise<() => Promise<void>> {
   const dataDir = mkdtempSync(join(tmpdir(), 'foqa-pgtest-'));
-  const port = 55439;
+  const port = await freePort();
   const pg = new EmbeddedPostgres({
     databaseDir: dataDir,
     user: 'postgres',
